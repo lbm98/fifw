@@ -17,20 +17,23 @@ TIME_BETWEEN_OBSERVATIONS = 0.05
 
 
 def observe_dbm(sta):
-    return sta.cmd('iw dev sta1-wlan0 link | grep signal | cut -d\  -f2')
+    data = sta.cmd(f'iw dev {sta.name}-wlan0 link | grep signal')
+    # the dbm is the second value in the list
+    return data.split(' ')[1].strip()
+
 
 """Observes throughput in bytes per second"""
 def observe_throughput(server_sta, client_sta):
 
-    # transmit for 1 second (-t1)
+    # transmit for 5 seconds (-t5)
     # present report results in CSV (-yC)
-    data = client_sta.cmd(f'iperf -c {server_sta.IP()} -yC -t5')
+    data = client_sta.cmd(f'iperf -c {server_sta.IP()} -yC -t1')
     # the throughput is the last value in the CSV list
     return data.split(',')[-1].strip()
 
 
-def store_observations(observations):
-    with open(f'yyy.data', 'w') as fh:
+def store_observations(observations, filename):
+    with open(filename + '.data', 'w') as fh:
         for obs in observations:
             fh.write(f'{obs}\n')
 
@@ -44,12 +47,16 @@ def run_test(net):
     sta0.cmd('iperf -s &')
     time.sleep(2)
 
-    observations = []
+    tp_list = []
+    dbm_list = []
     for i in range(10):
-        obs = observe_throughput(sta0, sta1)
-        observations.append(obs)
+        tp = observe_throughput(sta0, sta1)
+        dbm = observe_dbm(sta1)
+        tp_list.append(tp)
+        dbm_list.append(dbm)
 
-    store_observations(observations)
+    store_observations(tp_list, 'tp')
+    store_observations(dbm_list, 'dbm')
 
     sta0.cmd('kill iperf')
 
