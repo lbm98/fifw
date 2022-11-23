@@ -2,13 +2,20 @@ import matplotlib.pyplot as plt
 
 
 def main():
-    with open('sta1.data', 'r') as fh:
-        data = fh.readlines()
-        data = [int(x) for x in data]
+    with open('sta0.data', 'r') as fh:
+        lines = fh.readlines()
+
+        times = []
+        dbms = []
+        for data in lines:
+            time, dbm = data.split(" ")
+            dbm = dbm.strip()
+            times.append(float(time))
+            dbms.append(int(dbm))
 
         fig, ax = plt.subplots()
-        ax.plot(range(len(data)), data)
-        fig.savefig('sta1')
+        ax.scatter(times, dbms)
+        fig.savefig('sta0')
         plt.close()
 
 

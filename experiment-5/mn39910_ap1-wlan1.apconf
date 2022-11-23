@@ -1,9 +1,0 @@
-interface=ap1-wlan1
-driver=nl80211
-ssid=new-ssid
-wds_sta=1
-country_code=US
-hw_mode=a
-channel=36
-ctrl_interface=/var/run/hostapd
-ctrl_interface_group=0
